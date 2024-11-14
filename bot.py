@@ -45,7 +45,7 @@ async def start_task_handler(event: MessageEvent):
     """
     tasks[event.sender_id] = []
 
-    await event.respond('OK, send me some files.')
+    await event.respond('Хорошо, пришлите мне несколько файлов.')
 
     raise StopPropagation
 
@@ -68,16 +68,16 @@ async def zip_handler(event: MessageEvent):
     tasks. The zip filename must be provided in the command.
     """
     if event.sender_id not in tasks:
-        await event.respond('You must use /add first.')
+        await event.respond('Сначала необходимо использовать команду /add.')
     elif not tasks[event.sender_id]:
-        await event.respond('You must send me some files first.')
+        await event.respond('Сначала вы должны прислать мне несколько файлов.')
     else:
         messages = await bot.get_messages(
             event.sender_id, ids=tasks[event.sender_id])
         zip_size = sum([m.file.size for m in messages])
 
         if zip_size > 1024 * 1024 * 2000:   # zip_size > 1.95 GB approximately
-            await event.respond('Total filesize don\'t must exceed 2.0 GB.')
+            await event.respond('Общий размер файлов не должно превышать 2,0 ГБ.')
         else:
             root = STORAGE / f'{event.sender_id}/'
             zip_name = root / (event.pattern_match['name'] + '.zip')
@@ -86,7 +86,7 @@ async def zip_handler(event: MessageEvent):
                 await get_running_loop().run_in_executor(
                     None, partial(add_to_zip, zip_name, file))
             
-            await event.respond('Done!', file=zip_name)
+            await event.respond('Готово!', file=zip_name)
 
             await get_running_loop().run_in_executor(
                 None, rmtree, STORAGE / str(event.sender_id))
@@ -96,7 +96,7 @@ async def zip_handler(event: MessageEvent):
     raise StopPropagation
 
 
-@bot.on(NewMessage(pattern='/cancel'))
+@bot.on(NewMessage(pattern='/clear'))
 async def cancel_handler(event: MessageEvent):
     """
     Cleans the list of tasks for the user.
@@ -106,7 +106,7 @@ async def cancel_handler(event: MessageEvent):
     except KeyError:
         pass
 
-    await event.respond('Canceled zip. For a new one, use /add.')
+    await event.respond('Отмененная архивация. Для получения нового используйте /add.')
 
     raise StopPropagation
 
