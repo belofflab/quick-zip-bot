@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "src/bot.py" ]
+CMD [ "python", "bot.py" ]
